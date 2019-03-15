@@ -6,7 +6,9 @@ import ScreenQuad from './geometry/ScreenQuad';
 import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
+import Mesh from './geometry/Mesh'
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
+import {readTextFile} from './globals';
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
@@ -16,12 +18,16 @@ const controls = {
 let square: Square;
 let screenQuad: ScreenQuad;
 let time: number = 0.0;
+let dirt: Mesh;
 
 function loadScene() {
   square = new Square();
   square.create();
   screenQuad = new ScreenQuad();
   screenQuad.create();
+
+  // load from obj file
+
 
   // Set up instanced rendering data arrays here.
   // This example creates a set of positional
