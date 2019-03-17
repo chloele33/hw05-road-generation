@@ -10,6 +10,7 @@ const deg2Rad = 0.017453292519943295769236907684886;
 class Turtle {
     pos: vec4;
     orient: vec4;
+    forward: vec4;
     depth: number;
 
     // up: vec3;
@@ -45,7 +46,53 @@ class Turtle {
         let rad = deg2Rad * deg;
         mat4.fromRotation(rotmat, rad, axis);
         vec4.transformMat4(this.orient, this.orient, rotmat);
+        vec4.normalize(this.orient, this.orient);
+
     }
+
+    getTranslationMatrix() : mat4 {
+        let translation: vec4 = vec4.fromValues(this.pos[0], this.pos[1], this.pos[2], this.pos[3]);
+        let matrix = mat4.create();
+        let identity = mat4.create();
+        mat4.identity(identity);
+        mat4.translate(matrix, identity, vec3.fromValues(translation[0], translation[1], translation[2]));
+        return matrix;
+    }
+
+    getTransformation() : mat4 {
+        // prepare translation matrix
+        let translation: vec4 = vec4.fromValues(this.pos[0], this.pos[1], this.pos[2], this.pos[3]);
+        let translationMat = mat4.create();
+        let identity = mat4.create();
+        mat4.identity(identity);
+        mat4.translate(translationMat, identity, vec3.fromValues(translation[0], translation[1], translation[2]))
+
+        // prepare rotation mat
+        let baseDir: vec3 = vec3.fromValues(0, 1, 0);
+        let forwardDir: vec3 = vec3.fromValues(this.orient[0], this.orient[1], this.orient[2]);
+
+        let rotAxis = vec3.create();
+        vec3.cross(rotAxis, baseDir, forwardDir);
+
+        let theta = Math.acos(vec3.dot(baseDir, forwardDir) / (vec3.length(baseDir) * vec3.length(forwardDir)));
+
+        let rotMatrix = mat4.create();
+        mat4.fromRotation(rotMatrix, theta, rotAxis);
+
+        //prepare scale mat
+        let xScale = 10.0 * Math.pow((1 / this.depth), 1.3);
+        let zScale = 10.0 * Math.pow((1 / this.depth), 1.3);
+        let scaleMat = mat4.create();
+        let i = mat4.create()
+        mat4.identity(i);
+        mat4.scale(scaleMat, i, vec3.fromValues(xScale, 1, zScale));
+
+        let transform = mat4.create();
+        mat4.multiply(transform, translationMat, rotMatrix);
+        mat4.multiply(transform, transform, scaleMat);
+        return transform;
+    }
+
 
 }
 
