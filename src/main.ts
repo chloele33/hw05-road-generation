@@ -13,6 +13,8 @@ import {readTextFile} from './globals';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
+  'Show Terrain' : true,
+  'Show Population' : true
 };
 
 let square: Square;
@@ -27,6 +29,13 @@ function loadScene() {
   screenQuad.create();
 
   // load from obj file
+  // load mud
+  // let mudDada = readTextFile("https://raw.githubusercontent.com/chloele33/lsystem-tree/master/src/obj/mud.obj");
+  // let mudMesh = new Mesh(mudDada, vec3.fromValues(0,0,0));
+  // mudMesh.create();
+  //
+  // let mudColorArray = [220 / 255, 160 / 255, 120/255, 1];
+  // let cols = new Float32Array(mudColorArray);
 
 
   // Set up instanced rendering data arrays here.
@@ -36,6 +45,7 @@ function loadScene() {
   // one square is actually passed to the GPU
   let offsetsArray = [];
   let colorsArray = [];
+
   let n: number = 100.0;
   for(let i = 0; i < n; i++) {
     for(let j = 0; j < n; j++) {
@@ -66,6 +76,8 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
+  gui.add(controls, 'Show Terrain');
+  gui.add(controls, 'Show Population');
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -84,7 +96,8 @@ function main() {
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor(0.2, 0.2, 0.2, 1);
-  gl.enable(gl.BLEND);
+  gl.enable(gl.DEPTH_TEST)
+ // gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE); // Additive blending
 
   const instancedShader = new ShaderProgram([
@@ -105,9 +118,13 @@ function main() {
     flat.setTime(time++);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
+
+
+
+
     renderer.render(camera, flat, [screenQuad]);
     renderer.render(camera, instancedShader, [
-      square,
+      //square,
     ]);
     stats.end();
 

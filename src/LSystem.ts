@@ -3,7 +3,7 @@ import ExpansionRule from './ExpansionRule';
 import {Turtle, TurtleStack} from './Turtle'
 import DrawingRule from './DrawingRule';
 import  TreeScene  from "./geometry/TreeScene";
-import {vec3, vec4} from "gl-matrix";
+import {vec3, vec4, mat4} from "gl-matrix";
 import CustomMesh from './geometry/CustomMesh';
 import {readTextFile} from './globals';
 
@@ -30,6 +30,8 @@ export default class LSystem {
     leaf: any;
     treeScene: TreeScene;
     leafScene: TreeScene;
+
+    transformation: mat4;
 
 
 
