@@ -41,6 +41,8 @@ class ShaderProgram {
   unifEye: WebGLUniformLocation;
   unifUp: WebGLUniformLocation;
   unifDimensions: WebGLUniformLocation;
+  unifTerrain: WebGLUniformLocation;
+  unifPopulation: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
@@ -72,6 +74,10 @@ class ShaderProgram {
     this.attrTransformCol2 = gl.getAttribLocation(this.prog, "vs_Transform2");
     this.attrTransformCol3 = gl.getAttribLocation(this.prog, "vs_Transform3");
     this.attrTransformCol4 = gl.getAttribLocation(this.prog, "vs_Transform4");
+
+    // for texture
+    this.unifTerrain = gl.getUniformLocation(this.prog, "u_Terrain");
+    this.unifPopulation = gl.getUniformLocation(this.prog, "u_Population");
   }
 
   use() {
@@ -133,6 +139,20 @@ class ShaderProgram {
     this.use();
     if (this.unifTime !== -1) {
       gl.uniform1f(this.unifTime, t);
+    }
+  }
+
+  setTerrain(t: number) {
+    this.use();
+    if (this.unifTerrain !== -1) {
+      gl.uniform1f(this.unifTerrain, t);
+    }
+  }
+
+  setPopulation(t: number) {
+    this.use();
+    if (this.unifPopulation !== -1) {
+      gl.uniform1f(this.unifPopulation, t);
     }
   }
 
