@@ -140,12 +140,12 @@ float getTerrainHeight(float x, float y) {
 float getPopulationDensity(float x, float y, float terrainHeight) {
   //Population density. Denser population should be lighter in color.
   // population density is zero if is water
-    float scale = 1000.0;
-    float result = worley(x, y, scale);
+    float scale = 40.0;
+    float result = (1.0 - worley(x * 80.0 , y * 80.0 , scale) * 1.2) * terrainHeight / 1.5 + terrainHeight;
     if (terrainHeight < 0.2) {
         result = 0.0;
     }
-    return result;
+    return result * 0.8;
 }
 
 vec3 getTerrainColor(float terrainHeight) {
