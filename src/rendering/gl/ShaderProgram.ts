@@ -43,6 +43,7 @@ class ShaderProgram {
   unifDimensions: WebGLUniformLocation;
   unifTerrain: WebGLUniformLocation;
   unifPopulation: WebGLUniformLocation;
+  unifLandWater: WebGLUniformLocation;
   unifSampler2D: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
@@ -79,6 +80,7 @@ class ShaderProgram {
     // for texture
     this.unifTerrain = gl.getUniformLocation(this.prog, "u_Terrain");
     this.unifPopulation = gl.getUniformLocation(this.prog, "u_Population");
+    this.unifLandWater = gl.getUniformLocation(this.prog, "u_LandWater");
   }
 
   use() {
@@ -154,6 +156,13 @@ class ShaderProgram {
     this.use();
     if (this.unifPopulation !== -1) {
       gl.uniform1f(this.unifPopulation, t);
+    }
+  }
+
+  setLandVsWater(t: number) {
+    this.use();
+    if (this.unifLandWater !== -1) {
+      gl.uniform1f(this.unifLandWater, t);
     }
   }
 

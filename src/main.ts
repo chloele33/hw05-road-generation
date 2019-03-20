@@ -14,7 +14,8 @@ import {readTextFile} from './globals';
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
   'Show Terrain' : true,
-  'Show Population' : true
+  'Show Population' : true,
+  'Land vs. Water' : false
 };
 
 let square: Square;
@@ -78,6 +79,7 @@ function main() {
   const gui = new DAT.GUI();
   gui.add(controls, 'Show Terrain');
   gui.add(controls, 'Show Population');
+  gui.add(controls, 'Land vs. Water');
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -134,6 +136,12 @@ function main() {
       textureShader.setPopulation(1.0);
     } else {
       textureShader.setPopulation(0.0);
+    }
+
+    if (controls["Land vs. Water"] == true) {
+      textureShader.setLandVsWater(1.0);
+    } else {
+      textureShader.setLandVsWater(0.0);
     }
 
 

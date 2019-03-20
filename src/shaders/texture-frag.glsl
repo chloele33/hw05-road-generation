@@ -7,6 +7,7 @@ uniform float u_Time;
 uniform float u_Terrain;
 uniform float u_Population;
 uniform sampler2D u_Texture;
+uniform float u_LandWater;
 
 in vec2 fs_Pos;
 out vec4 out_Col;
@@ -143,6 +144,14 @@ void main() {
   if (u_Terrain == 1.0) {
     color += textureCol.rgb;
 
+  }
+  if (u_LandWater == 1.0) {
+    //Include an option to display a simple land versus water view.
+    if (textureCol.g <= textureCol.b) {
+        color = vec3(6.0 / 255.0, 42.0 / 255.0, 76.0 / 255.0);
+      } else {
+        color = vec3(68.0 / 255.0, 100.0 / 255.0, 11.0 / 255.0);
+      }
   }
   out_Col = vec4(color, 1.0);
 }

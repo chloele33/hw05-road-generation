@@ -142,10 +142,10 @@ float getPopulationDensity(float x, float y, float terrainHeight) {
   // population density is zero if is water
     float scale = 40.0;
     float result = (1.0 - worley(x * 80.0 , y * 80.0 , scale) * 1.2) * terrainHeight / 1.5 + terrainHeight;
-    if (terrainHeight < 0.2) {
+    if (terrainHeight < 0.20) {
         result = 0.0;
     }
-    return result * 0.8;
+    return result - 0.15;
 }
 
 vec3 getTerrainColor(float terrainHeight) {
@@ -168,7 +168,6 @@ vec3 getTerrainColor(float terrainHeight) {
 
 
 void main() {
-  //Include an option to display a simple land versus water view.
   vec2 pos = fs_Pos.xy;
   float terrainHeight = getTerrainHeight(pos.x * 5.0, pos.y * 5.0);
   float populationDensity = getPopulationDensity(pos.x, pos.y, terrainHeight);
