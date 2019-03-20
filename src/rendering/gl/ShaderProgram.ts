@@ -43,6 +43,7 @@ class ShaderProgram {
   unifDimensions: WebGLUniformLocation;
   unifTerrain: WebGLUniformLocation;
   unifPopulation: WebGLUniformLocation;
+  unifSampler2D: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
@@ -239,6 +240,10 @@ class ShaderProgram {
     if (this.attrTransformCol2 != -1) gl.disableVertexAttribArray(this.attrTransformCol2);
     if (this.attrTransformCol3 != -1) gl.disableVertexAttribArray(this.attrTransformCol3);
     if (this.attrTransformCol4 != -1) gl.disableVertexAttribArray(this.attrTransformCol4);
+
+    // for texture:
+    gl.uniform1i(this.unifSampler2D, 0);
+
   }
 };
 

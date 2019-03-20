@@ -136,49 +136,7 @@ function main() {
       textureShader.setPopulation(0.0);
     }
 
-    // -------------------for texture renderer --------------------
-    var tex_frameBuffer = gl.createFramebuffer();
-    var tex_renderBuffer = gl.createRenderbuffer();
-    var texture = gl.createTexture();
-    // bind texture
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, window.innerWidth, window.innerHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    // set texture's render settings
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-    // bind frame buffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, tex_frameBuffer);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-
-    // bind render buffer
-    gl.bindRenderbuffer(gl.RENDERBUFFER, tex_renderBuffer);
-    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, window.innerWidth, window.innerHeight);
-    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, tex_renderBuffer);
-
-    gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
-
-    // render to frame buffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, tex_frameBuffer);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    // Render on the whole framebuffer, complete from the lower left corner to the upper right
-    gl.viewport(0, 0, window.innerWidth, window.innerHeight);
-    // clear screen
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    renderer.render(camera, flat, [screenQuad]);
-
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, window.innerWidth, window.innerHeight);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
-
-    //------------------------------------------------------------------
 
     renderer.render(camera, textureShader, [screenQuad]);
     // renderer.render(camera, flat, [screenQuad]);
@@ -190,6 +148,49 @@ function main() {
     // Tell the browser to call `tick` again whenever it renders a new frame
     requestAnimationFrame(tick);
   }
+
+  // -------------------for texture renderer --------------------
+  var tex_frameBuffer = gl.createFramebuffer();
+  var tex_renderBuffer = gl.createRenderbuffer();
+  var texture = gl.createTexture();
+  // bind texture
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, window.innerWidth, window.innerHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  // set texture's render settings
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+  // bind frame buffer
+  gl.bindFramebuffer(gl.FRAMEBUFFER, tex_frameBuffer);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+
+  // bind render buffer
+  gl.bindRenderbuffer(gl.RENDERBUFFER, tex_renderBuffer);
+  gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, window.innerWidth, window.innerHeight);
+  gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, tex_renderBuffer);
+
+  gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
+
+  // render to frame buffer
+  gl.bindFramebuffer(gl.FRAMEBUFFER, tex_frameBuffer);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  // Render on the whole framebuffer, complete from the lower left corner to the upper right
+  gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+  // clear screen
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  renderer.render(camera, flat, [screenQuad]);
+
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+
+  //------------------------------------------------------------------
 
   window.addEventListener('resize', function() {
     renderer.setSize(window.innerWidth, window.innerHeight);
