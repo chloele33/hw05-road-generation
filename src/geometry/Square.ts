@@ -8,6 +8,12 @@ class Square extends Drawable {
   colors: Float32Array;
   offsets: Float32Array; // Data for bufTranslate
 
+  col1: Float32Array;
+  col2: Float32Array;
+  col3: Float32Array;
+  col4: Float32Array;
+
+
 
   constructor() {
     super(); // Call the constructor of the super class. This is required.
@@ -45,6 +51,30 @@ class Square extends Drawable {
     gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTranslate);
     gl.bufferData(gl.ARRAY_BUFFER, this.offsets, gl.STATIC_DRAW);
+  }
+
+  setInstanceVBOs2(col1: Float32Array,
+                               col2: Float32Array,
+                               col3: Float32Array,
+                               col4: Float32Array,
+                               colors: Float32Array) {
+    this.col1 = col1;
+    this.col2 = col2;
+    this.col3 = col3;
+    this.col4 = col4;
+    this.colors = colors;
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransformCol1);
+    gl.bufferData(gl.ARRAY_BUFFER, this.col1, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransformCol2);
+    gl.bufferData(gl.ARRAY_BUFFER, this.col2, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransformCol3);
+    gl.bufferData(gl.ARRAY_BUFFER, this.col3, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransformCol4);
+    gl.bufferData(gl.ARRAY_BUFFER, this.col4, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+    gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
   }
 };
 

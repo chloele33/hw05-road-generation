@@ -9,6 +9,7 @@ import {setGL} from './globals';
 import Mesh from './geometry/Mesh'
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import {readTextFile} from './globals';
+import {LSystemRoad} from './LSystemRoad';
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
@@ -21,7 +22,8 @@ const controls = {
 let square: Square;
 let screenQuad: ScreenQuad;
 let time: number = 0.0;
-let dirt: Mesh;
+let lsystemRoad: LSystemRoad;
+
 
 function loadScene() {
   square = new Square();
@@ -65,6 +67,10 @@ function loadScene() {
   square.setInstanceVBOs(offsets, colors);
   square.setNumInstances(n * n); // grid of "particles"
 }
+
+// function loadLSystemScene(lsystemRoad: LSystemRoad) {
+//
+// }
 
 function main() {
   // Initial display for framerate
@@ -198,7 +204,13 @@ function main() {
   gl.readPixels(0, 0, window.innerWidth, window.innerHeight, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
 
   // pass texture data to road LSystem
+  lsystemRoad = new LSystemRoad(texturePixels, window.innerWidth, window.innerHeight);
+  // run LSystem
 
+  // instance render road system
+  let vboData = lsystemRoad.getVBO();
+  square.setInstanceVBOs2(vboData.col1, vboData.col2, vboData.col3, vboData.col4, vboData.colors);
+  square.setNumInstances(vboData.col1.length / 4.0);
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
