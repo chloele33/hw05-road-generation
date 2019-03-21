@@ -191,12 +191,13 @@ function main() {
 
   renderer.render(camera, flat, [screenQuad]);
 
-  // save texture
-  if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE) {
-    var pixels = new Uint8Array(window.innerWidth * window.innerHeight * 4);
-    gl.readPixels(0, 0, window.innerWidth, window.innerHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-  }
+  // save texture date
+  gl.bindFramebuffer(gl.FRAMEBUFFER, tex_frameBuffer);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+  var texturePixels = new Uint8Array(window.innerWidth * window.innerHeight * 4);
+  gl.readPixels(0, 0, window.innerWidth, window.innerHeight, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
 
+  // pass texture data to road LSystem
 
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
