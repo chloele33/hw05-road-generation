@@ -23,15 +23,20 @@ class Square extends Drawable {
 
   this.indices = new Uint32Array([0, 1, 2,
                                   0, 2, 3]);
-  this.positions = new Float32Array([-0.5, -0.5, 0, 1,
-                                     0.5, -0.5, 0, 1,
-                                     0.5, 0.5, 0, 1,
-                                     -0.5, 0.5, 0, 1]);
+  this.positions = new Float32Array([-0.5, 0, -0.5, 1,
+                                     0.5, 0, -0.5, 1,
+                                     0.5, 0, 0.5, 1,
+                                     -0.5, 0, 0.5, 1]);
+
 
     this.generateIdx();
     this.generatePos();
     this.generateCol();
-    this.generateTranslate();
+    //this.generateTranslate();
+    this.generateTransformCol1();
+    this.generateTransformCol2();
+    this.generateTransformCol3();
+    this.generateTransformCol4();
 
     this.count = this.indices.length;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);
@@ -63,6 +68,14 @@ class Square extends Drawable {
     this.col3 = col3;
     this.col4 = col4;
     this.colors = colors;
+
+    // console.log(this.col1);
+    // console.log(this.col2);
+    //
+    // console.log(this.col3);
+    //
+    // console.log(this.col4);
+
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransformCol1);
     gl.bufferData(gl.ARRAY_BUFFER, this.col1, gl.STATIC_DRAW);

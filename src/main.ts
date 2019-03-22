@@ -46,26 +46,26 @@ function loadScene() {
   // offsets and gradiated colors for a 100x100 grid
   // of squares, even though the VBO data for just
   // one square is actually passed to the GPU
-  let offsetsArray = [];
-  let colorsArray = [];
-
-  let n: number = 100.0;
-  for(let i = 0; i < n; i++) {
-    for(let j = 0; j < n; j++) {
-      offsetsArray.push(i);
-      offsetsArray.push(j);
-      offsetsArray.push(0);
-
-      colorsArray.push(i / n);
-      colorsArray.push(j / n);
-      colorsArray.push(1.0);
-      colorsArray.push(1.0); // Alpha channel
-    }
-  }
-  let offsets: Float32Array = new Float32Array(offsetsArray);
-  let colors: Float32Array = new Float32Array(colorsArray);
-  square.setInstanceVBOs(offsets, colors);
-  square.setNumInstances(n * n); // grid of "particles"
+  // let offsetsArray = [];
+  // let colorsArray = [];
+  //
+  // let n: number = 100.0;
+  // for(let i = 0; i < n; i++) {
+  //   for(let j = 0; j < n; j++) {
+  //     offsetsArray.push(i);
+  //     offsetsArray.push(j);
+  //     offsetsArray.push(0);
+  //
+  //     colorsArray.push(i / n);
+  //     colorsArray.push(j / n);
+  //     colorsArray.push(1.0);
+  //     colorsArray.push(1.0); // Alpha channel
+  //   }
+  // }
+  // let offsets: Float32Array = new Float32Array(offsetsArray);
+  // let colors: Float32Array = new Float32Array(colorsArray);
+  // square.setInstanceVBOs(offsets, colors);
+  // square.setNumInstances(n * n); // grid of "particles"
 }
 
 // function loadLSystemScene(lsystemRoad: LSystemRoad) {
@@ -129,8 +129,14 @@ function main() {
     stats.begin();
     instancedShader.setTime(time);
     flat.setTime(time++);
+    //gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+    //renderer.clear();
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
-    renderer.clear();
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
 
     if (controls["Show Terrain"] == true) {
       textureShader.setTerrain(1.0);
@@ -153,10 +159,10 @@ function main() {
 
 
     renderer.render(camera, textureShader, [screenQuad]);
-    // renderer.render(camera, flat, [screenQuad]);
-    // renderer.render(camera, instancedShader, [
-    //   square,
-    // ]);
+    //renderer.render(camera, flat, [screenQuad]);
+    renderer.render(camera, instancedShader, [
+      square,
+    ]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
@@ -167,9 +173,11 @@ function main() {
   var tex_frameBuffer = gl.createFramebuffer();
   var tex_renderBuffer = gl.createRenderbuffer();
   var texture = gl.createTexture();
+  var width = window.innerWidth;
+  var height = window.innerHeight;
   // bind texture
   gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, window.innerWidth, window.innerHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
   // set texture's render settings
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -182,7 +190,7 @@ function main() {
 
   // bind render buffer
   gl.bindRenderbuffer(gl.RENDERBUFFER, tex_renderBuffer);
-  gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, window.innerWidth, window.innerHeight);
+  gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
   gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, tex_renderBuffer);
 
   gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
@@ -200,22 +208,17 @@ function main() {
   // save texture date
   gl.bindFramebuffer(gl.FRAMEBUFFER, tex_frameBuffer);
   gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-  var texturePixels = new Uint8Array(window.innerWidth * window.innerHeight * 4);
-  gl.readPixels(0, 0, window.innerWidth, window.innerHeight, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
+  var texturePixels = new Uint8Array(width * height * 4);
+  gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
 
   // pass texture data to road LSystem
-  lsystemRoad = new LSystemRoad(texturePixels, window.innerWidth, window.innerHeight);
+  lsystemRoad = new LSystemRoad(texturePixels, width, height);
   // run LSystem
 
   // instance render road system
   let vboData = lsystemRoad.getVBO();
   square.setInstanceVBOs2(vboData.col1, vboData.col2, vboData.col3, vboData.col4, vboData.colors);
   square.setNumInstances(vboData.col1.length / 4.0);
-
-  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, texture);
 
 
   //------------------------------------------------------------------
@@ -225,12 +228,14 @@ function main() {
     camera.setAspectRatio(window.innerWidth / window.innerHeight);
     camera.updateProjectionMatrix();
     flat.setDimensions(window.innerWidth, window.innerHeight);
+    //instancedShader.setDimensions(window.innerWidth, window.innerHeight);
   }, false);
 
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.setAspectRatio(window.innerWidth / window.innerHeight);
   camera.updateProjectionMatrix();
   flat.setDimensions(window.innerWidth, window.innerHeight);
+  instancedShader.setDimensions(window.innerWidth, window.innerHeight);
 
   // Start the render loop
   tick();

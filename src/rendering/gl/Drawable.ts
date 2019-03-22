@@ -49,6 +49,7 @@ abstract class Drawable {
 
   // generateTransformCol_'s are for instanced rendering
   generateTransformCol1() {
+    console.log("HHIHIh");
     this.transformCol1Generated = true;
     this.bufTransformCol1 = gl.createBuffer();
   }
@@ -103,8 +104,10 @@ abstract class Drawable {
     if (this.transformCol1Generated) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTransformCol1);
     }
+
     return this.transformCol1Generated;
   }
+
 
   bindTransformCol2(): boolean {
     if (this.transformCol2Generated) {

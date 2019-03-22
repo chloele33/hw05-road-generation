@@ -45,6 +45,8 @@ class ShaderProgram {
   unifPopulation: WebGLUniformLocation;
   unifLandWater: WebGLUniformLocation;
   unifSampler2D: WebGLUniformLocation;
+  unifWidth: WebGLUniformLocation;
+  unifHeight: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
     this.prog = gl.createProgram();
@@ -70,6 +72,10 @@ class ShaderProgram {
     this.unifEye   = gl.getUniformLocation(this.prog, "u_Eye");
     this.unifRef   = gl.getUniformLocation(this.prog, "u_Ref");
     this.unifUp   = gl.getUniformLocation(this.prog, "u_Up");
+    this.unifWidth =gl.getUniformLocation(this.prog, "u_Width");
+    this.unifHeight =gl.getUniformLocation(this.prog, "u_Height");
+    this.unifDimensions = gl.getUniformLocation(this.prog, "u_Dimensions");
+
 
     // for instanced rendering
     this.attrTransformCol1 = gl.getAttribLocation(this.prog, "vs_Transform1");
@@ -205,6 +211,7 @@ class ShaderProgram {
       gl.vertexAttribPointer(this.attrTransformCol1, 4, gl.FLOAT, false, 0, 0);
       gl.vertexAttribDivisor(this.attrTransformCol1, 1); // Advance 1 index in transformation VBO for each drawn instance
     }
+
 
     if (this.attrTransformCol2 != -1 && d.bindTransformCol2()) {
       gl.enableVertexAttribArray(this.attrTransformCol2);

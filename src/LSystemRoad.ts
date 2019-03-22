@@ -13,7 +13,7 @@ class LSystemRoad {
     turtleStackHighway: TurtleStack;
 
     // Store your roads as sets of edges and intersections
-    edges:Edge[];
+    edges: Edge[];
     intersections: Intersection[];
 
     constructor (textureData: Uint8Array, texWidth: number, texHeight: number) {
@@ -22,6 +22,11 @@ class LSystemRoad {
         let orient = vec4.fromValues(0, 1, 0, 0);
         this.mapTexture = new MapTexture(textureData, texWidth, texHeight);
         this.currTurtle = new Turtle(randPos, orient, 1);
+        this.edges = [];
+        this.intersections = [];
+        this.edges.push(new Edge(vec3.fromValues(0, 0, 60), vec3.fromValues(2000,0, 2000), 5));
+        this.edges.push(new Edge(vec3.fromValues(20, 0, 0), vec3.fromValues(2000,0, 2000), 15));
+
     }
 
     // generate highway system
@@ -99,7 +104,8 @@ class LSystemRoad {
 
         for (var i = 0; i < this.edges.length; i++) {
             let currEdge = this.edges[i];
-            let currTransform = currEdge.getTranform();
+            let currTransform = currEdge.getTransform();
+            console.log(currTransform);
 
             col1Array.push(currTransform[0]);
             col1Array.push(currTransform[1]);
@@ -200,22 +206,22 @@ class Edge {
         this.size = size;
     }
 
-    getTranform() {
+    getTransform() {
         let up = vec3.fromValues(0, 0, 1);
         let dir: vec3 = vec3.fromValues(0, 0, 0);
         vec3.subtract(dir, this.endPoint, this.startingPoint);
 
         // get angle
-        let x1 = this.startingPoint[0];
-        let y1 = this.startingPoint[2];
+        let x1 = up[0];
+        let y1 = up[2];
 
-        let x2 = this.endPoint[0];
-        let y2 = this.endPoint[2];
+        let x2 = dir[0];
+        let y2 = dir[2];
 
         let angleRad = -Math.atan2(x1 * y2 - y1 * x2, x1 * x2 + y1 * y2);
-        let globalRotate = vec3.fromValues(0, 1, 0);
-        let rotationQuat = quat.create();
-        quat.setAxisAngle(rotationQuat, globalRotate, angleRad);
+        let rot = vec3.fromValues(0, 1, 0);
+        let rotQuat = quat.create();
+        quat.setAxisAngle(rotQuat, rot, angleRad);
 
         // mid point
         let x = this.startingPoint[0] + this.endPoint[0];
@@ -223,8 +229,9 @@ class Edge {
         let z = this.startingPoint[2] + this.endPoint[2];
         let translate = vec3.fromValues(x / 2, y / 2, z / 2);
         let scaleVec = vec3.fromValues(this.size, 1, vec3.length(dir));
+
         let transformationMat: mat4 = mat4.create();
-        mat4.fromRotationTranslationScale(transformationMat, rotationQuat, translate, scaleVec);
+        mat4.fromRotationTranslationScale(transformationMat, rotQuat, translate, scaleVec);
         return transformationMat;
     }
 
