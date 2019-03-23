@@ -71,28 +71,72 @@ class LSystemRoad {
         return Math.sqrt(a + b + c);
     }
 
+    // check if will intersect with street
+    // returns the new pruned line's intersection if so, null otherwise
+    intersectsExistingStreet(startingPoint: vec3, endPoint: vec3, size: number) : Intersection {
+        // check if proposed street intersects any existing edge
+        for (let i: number = 0; i < this.edges.length; i++) {
+            let currEdge = this.edges[i];
+            // check if proposed street intersects this edge
+            let proposedIntersection = currEdge.intersectsEdgeAt(startingPoint, endPoint, size);
+            // if intersection exists, snap to the new intersection
+            if (proposedIntersection != null) {
+                return proposedIntersection;
+            }
+        }
+        return null;
+    }
 
-    // adding an edge/road to the system, origin is current turtle's position
-    // end point is checked
+    // check if edge is close to intersecting with another street
+    // returns the new extended line's intersection if so, null otherwise
+    extendSegment(startingPoint: vec3, endPoint: vec3, size: number, searchDist: number) : Intersection {
+        // created extended line
+        let proposedStreetDir = vec3.fromValues(endPoint[0]- startingPoint[0],
+            endPoint[1]- startingPoint[1],
+            endPoint[2]- startingPoint[2]);
+        let dist = vec3.create();
+        vec3.multiply(dist, [searchDist, searchDist, searchDist], proposedStreetDir);
+        vec3.add(endPoint, endPoint, dist);
+        // using the updated endpoint, test if now intersects any of the existing streets
+        return this.intersectsExistingStreet(startingPoint,endPoint,size);
+    }
+
+
+    // adding an edge/road to the system
+    // origin is current turtle's position
+    // endPoint is the proposed endpoint
+    // size is width of the road
+    // end point is checked and returned
     addRoadToNetwork(startingPoint: vec3, endPoint: vec3, size: number) : vec3 {
+        // look for the correct endpoint
+        // LOCAL CONSTRAINTS
+        // if two streets intersect, generate an intersection
+        let pruneToIntersection = this.intersectsExistingStreet(startingPoint, endPoint, size);
+        if (pruneToIntersection != null) {
+            endPoint = pruneToIntersection.position;
+        } else {
+            // if the end point is close to an existing intersection, use that inter as endpoint
+            let searchDist = 5;
+            let nearInter = this.existsCloseIntersection(endPoint, size, searchDist);
+            if (nearInter != null) {
+                endPoint = nearInter.position;
+            } else {
+                // if close to intersecting a street, extend street to form an intersection
+                let extendedInter = this.extendSegment(startingPoint, endPoint, size, searchDist);
+                if (extendedInter != null) {
+                    endPoint = extendedInter.position;
+                }
+            }
+        }
 
         let newEdge = new Edge(startingPoint, endPoint, size);
         let endNode = new Intersection(endPoint, size);
-        // look for the correct endpoint
-        let correct_end: vec3;
 
-        // if two streets intersect, generate an intersection
+        //push to our collections of intersections and edges
+        this.edges.push(newEdge);
+        this.intersections.push(endNode);
 
-        // if the end point is close to an existing intersection, use that inter as endpoint
-        let searchDist = 5;
-        let nearInter = this.existsCloseIntersection(endPoint, size, searchDist);
-        if (nearInter != null) {
-            correct_end = nearInter.position;
-        }
-
-        // if close to intersecting, extend street to form an intersection
-
-        return correct_end;
+        return endPoint;
     }
 
     getVBO() {
@@ -205,6 +249,37 @@ class Edge {
         this.endPoint = end;
         this.size = size;
     }
+
+    // checks if ths edge would intersect the edge passed in
+    // returns the intersection if intersects, null otherwise
+    intersectsEdgeAt(edgeStart: vec3, edgeEnd: vec3, size: number) : Intersection {
+        let p0_x = this.startingPoint[0];
+        let p0_y = this.startingPoint[2];
+        let p1_x = this.endPoint[0];
+        let p1_y = this.endPoint[2];
+
+        let p2_x = edgeStart[0];
+        let p2_y = edgeStart[2];
+        let p3_x = edgeEnd[0];
+        let p3_y = edgeEnd[2];
+
+        let s1_x: number = p1_x - p0_x;
+        let s1_y: number = p1_y - p0_y;
+        let s2_x: number = p3_x - p2_x;
+        let s2_y: number = p3_y - p2_y;
+
+        let s: number = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+        let t: number = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+        if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
+            let x_result: number = p0_x + (t * s1_x);
+            let y_Result: number = p0_y + (t * s1_y);
+            return new Intersection(vec3.fromValues(x_result, 0, y_Result), size);
+        }
+
+        return null;
+    }
+
 
     getTransform() {
         let up = vec3.fromValues(0, 0, 1);

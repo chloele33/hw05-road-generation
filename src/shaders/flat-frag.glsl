@@ -141,7 +141,7 @@ float getPopulationDensity(float x, float y, float terrainHeight) {
   //Population density. Denser population should be lighter in color.
   // population density is zero if is water
     float scale = 40.0;
-    float result = (1.0 - worley(x * 80.0 , y * 80.0 , scale) * 1.2) * terrainHeight / 1.5 + terrainHeight;
+    float result = (1.0 - worley(x * 100.0 , y * 100.0 , scale) * 1.2) * terrainHeight / 1.5 + terrainHeight;
     if (terrainHeight < 0.20) {
         result = 0.0;
     }
