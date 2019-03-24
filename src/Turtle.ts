@@ -12,6 +12,7 @@ class Turtle {
     orient: vec4;
     forward: vec4;
     depth: number;
+    alive: boolean;
 
     // up: vec3;
     // forward: vec3;
@@ -29,12 +30,15 @@ class Turtle {
         let tempDepth = 0;
         tempDepth = tempDepth + depth;
         this.depth = tempDepth;
+        this.alive = true;
     }
 
     moveForward(d: number) {
         let dist = vec4.create();
         vec4.multiply(dist, [d, d, d, 1], this.orient);
         vec4.add(this.pos, this.pos, dist);
+        this.depth++;
+        return this.pos;
     }
 
     public rotate(axis: vec3, deg: number) {
@@ -47,7 +51,7 @@ class Turtle {
         mat4.fromRotation(rotmat, rad, axis);
         vec4.transformMat4(this.orient, this.orient, rotmat);
         vec4.normalize(this.orient, this.orient);
-
+        return this.orient;
     }
 
     getTranslationMatrix() : mat4 {
@@ -105,6 +109,10 @@ class TurtleStack {
 
     public pop(): Turtle {
         return this.list.pop();
+    }
+
+    public size(): number {
+        return this.list.length;
     }
 }
 

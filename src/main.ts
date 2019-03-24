@@ -133,7 +133,7 @@ function main() {
     //renderer.clear();
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+    gl.viewport(0, 0, 2000, 2000);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -175,6 +175,8 @@ function main() {
   var texture = gl.createTexture();
   var width = window.innerWidth;
   var height = window.innerHeight;
+  width = 2000;
+  height = 2000;
   // bind texture
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -199,7 +201,7 @@ function main() {
   gl.bindFramebuffer(gl.FRAMEBUFFER, tex_frameBuffer);
   gl.bindTexture(gl.TEXTURE_2D, texture);
   // Render on the whole framebuffer, complete from the lower left corner to the upper right
-  gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+  gl.viewport(0, 0, 2000, 2000);
   // clear screen
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -212,7 +214,9 @@ function main() {
   gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
 
   // pass texture data to road LSystem
-  lsystemRoad = new LSystemRoad(texturePixels, width, height);
+  let roadLength = 500;
+  let highwayAngle = 10;
+  lsystemRoad = new LSystemRoad(texturePixels, width, height, roadLength, highwayAngle);
   // run LSystem
 
   // instance render road system
@@ -224,18 +228,17 @@ function main() {
   //------------------------------------------------------------------
 
   window.addEventListener('resize', function() {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.setAspectRatio(window.innerWidth / window.innerHeight);
+    renderer.setSize(2000, 2000);
+    camera.setAspectRatio(2000/2000);
     camera.updateProjectionMatrix();
-    flat.setDimensions(window.innerWidth, window.innerHeight);
-    //instancedShader.setDimensions(window.innerWidth, window.innerHeight);
+    flat.setDimensions(2000, 2000);
   }, false);
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  camera.setAspectRatio(window.innerWidth / window.innerHeight);
+  renderer.setSize(2000, 2000);
+  camera.setAspectRatio(2000 / 2000);
   camera.updateProjectionMatrix();
-  flat.setDimensions(window.innerWidth, window.innerHeight);
-  instancedShader.setDimensions(window.innerWidth, window.innerHeight);
+  flat.setDimensions(2000, 2000);
+  instancedShader.setDimensions(2000,  2000);
 
   // Start the render loop
   tick();

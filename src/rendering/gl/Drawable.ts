@@ -49,7 +49,6 @@ abstract class Drawable {
 
   // generateTransformCol_'s are for instanced rendering
   generateTransformCol1() {
-    console.log("HHIHIh");
     this.transformCol1Generated = true;
     this.bufTransformCol1 = gl.createBuffer();
   }
