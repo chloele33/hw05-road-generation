@@ -13,24 +13,26 @@ class Turtle {
     forward: vec4;
     depth: number;
     alive: boolean;
+    iteration: number;
 
     // up: vec3;
     // forward: vec3;
     // left: vec3;
 
-    constructor(pos: vec4, orient: vec4, depth: number) {
+    constructor(pos: vec4, orient: vec4, depth: number, iteration: number) {
         let tempPos = vec4.create();
         vec4.add(tempPos, tempPos, pos);
-        this.pos = tempPos;
+        this.pos = pos;
 
         let tempOrient = vec4.create();
         vec4.add(tempOrient, tempOrient, orient);
-        this.orient = tempOrient;
+        this.orient = orient;
 
         let tempDepth = 0;
         tempDepth = tempDepth + depth;
-        this.depth = tempDepth;
+        this.depth = depth;
         this.alive = true;
+        this.iteration = iteration;
     }
 
     moveForward(d: number) {

@@ -216,7 +216,8 @@ function main() {
   // pass texture data to road LSystem
   let highwayLength = 400;
   let highwayAngle = 10;
-  lsystemRoad = new LSystemRoad(texturePixels, width, height, highwayLength, highwayAngle);
+  let roadLength = 30;
+  lsystemRoad = new LSystemRoad(texturePixels, width, height, highwayLength, highwayAngle, roadLength);
   // run LSystem
 
   // instance render road system
