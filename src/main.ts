@@ -18,7 +18,7 @@ const controls = {
   'Show Population' : true,
   'Land vs. Water' : false,
   'Iterations': 5,
-  'Road Length': 35,
+  'Road Length': 40,
   'Highway Length': 400,
   'Snap Coefficient': 0.2,
   'Extension Coefficient': 0.02
@@ -45,7 +45,7 @@ gui.add(controls, 'Road Length', 18, 50).step(1).onChange(
     function() {
       rerun = true;
     }.bind(this));
-gui.add(controls, 'Highway Length', 385, 400).step(1).onChange(
+gui.add(controls, 'Highway Length', 385, 405).step(1).onChange(
     function() {
       rerun = true;
     }.bind(this));
