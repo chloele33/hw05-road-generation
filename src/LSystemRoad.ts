@@ -175,7 +175,7 @@ class LSystemRoad {
         //this.intersections.push(new Intersection(correctEndPoint,this.highwaySize));
 
         // at every highway intersection, grow and push two road turtles to prep for road generation
-        if (!this.intersectionsSet.has(newInter) && this.currTurtle.iteration < 2) {
+        if (!this.intersectionsSet.has(newInter) && this.currTurtle.iteration < 3) {
             let roadTurtleOrigin = vec4.fromValues(origin[0], origin[1], origin[2], origin[3]);
             let roadTurtleDir = vec4.fromValues(this.currTurtle.orient[0], this.currTurtle.orient[1],
                 this.currTurtle.orient[2], this.currTurtle.orient[3]);
@@ -472,14 +472,14 @@ class LSystemRoad {
 
         } else {
             // if the end point is close to an existing intersection, use that inter as endpoint
-            let searchDist = 0.8 * this.highwayLength;
+            let searchDist = 50;
             let nearInter = this.existsCloseIntersection(testPoint, size, searchDist);
             if (nearInter != null) {
                 testPoint = nearInter.position;
                 vec3.copy(endPoint, testPoint);
             } else {
                 // if close to intersecting a street, extend street to form an intersection
-                let extendedInter = this.extendSegment(startingPoint, testPoint, size, 0.1 * this.highwayLength);
+                let extendedInter = this.extendSegment(startingPoint, testPoint, size, 0.01 * this.highwayLength);
                 if (extendedInter != null) {
                     testPoint = extendedInter.position;
                     vec3.copy(endPoint, testPoint);

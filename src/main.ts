@@ -19,6 +19,7 @@ const controls = {
   'Land vs. Water' : false,
   'Iterations': 5,
   'Road Length': 25,
+  'Highway Length': 400,
 };
 
 let square: Square;
@@ -42,11 +43,15 @@ gui.add(controls, 'Road Length', 18, 40).step(1).onChange(
     function() {
       rerun = true;
     }.bind(this));
+gui.add(controls, 'Highway Length', 385, 400).step(1).onChange(
+    function() {
+      rerun = true;
+    }.bind(this));
 
 
 function generateRoad() {
   // pass texture data to road LSystem
-  let highwayLength = 400;
+  let highwayLength = controls["Highway Length"];
   let highwayAngle = 10;
   let roadLength = controls['Road Length'];
   let iterations = controls['Iterations'];
