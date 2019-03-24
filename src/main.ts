@@ -16,13 +16,43 @@ import {LSystemRoad} from './LSystemRoad';
 const controls = {
   'Show Terrain' : true,
   'Show Population' : true,
-  'Land vs. Water' : false
+  'Land vs. Water' : false,
+  'Iterations': 5,
+  'Road Length': 25,
 };
 
 let square: Square;
 let screenQuad: ScreenQuad;
 let time: number = 0.0;
 let lsystemRoad: LSystemRoad;
+let preIter = 5;
+let textureData: Uint8Array;
+let preRoadLength = 20;
+let rerun = false;
+const gui = new DAT.GUI();
+// Add controls to the gui
+gui.add(controls, 'Show Terrain');
+gui.add(controls, 'Show Population');
+gui.add(controls, 'Land vs. Water');
+gui.add(controls, 'Iterations', 1, 7).step(1).onChange(
+    function() {
+      rerun = true;
+    }.bind(this));
+gui.add(controls, 'Road Length', 18, 40).step(1).onChange(
+    function() {
+      rerun = true;
+    }.bind(this));
+
+
+function generateRoad() {
+  // pass texture data to road LSystem
+  let highwayLength = 400;
+  let highwayAngle = 10;
+  let roadLength = controls['Road Length'];
+  let iterations = controls['Iterations'];
+  lsystemRoad.run(highwayLength, highwayAngle, roadLength, iterations);
+  // run LSystem
+}
 
 
 function loadScene() {
@@ -81,11 +111,7 @@ function main() {
   stats.domElement.style.top = '0px';
   document.body.appendChild(stats.domElement);
 
-  // Add controls to the gui
-  const gui = new DAT.GUI();
-  gui.add(controls, 'Show Terrain');
-  gui.add(controls, 'Show Population');
-  gui.add(controls, 'Land vs. Water');
+
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -156,6 +182,10 @@ function main() {
       textureShader.setLandVsWater(0.0);
     }
 
+    if (rerun) {
+      rerun = false;
+      main();
+    }
 
 
     renderer.render(camera, textureShader, [screenQuad]);
@@ -212,13 +242,18 @@ function main() {
   gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
   var texturePixels = new Uint8Array(width * height * 4);
   gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
+  textureData = texturePixels;
 
   // pass texture data to road LSystem
-  let highwayLength = 400;
-  let highwayAngle = 10;
-  let roadLength = 30;
-  lsystemRoad = new LSystemRoad(texturePixels, width, height, highwayLength, highwayAngle, roadLength);
-  // run LSystem
+  // let highwayLength = 400;
+  // let highwayAngle = 10;
+  // let roadLength = 30;
+  // let iterations = controls['Iterations'];
+  // lsystemRoad = new LSystemRoad(texturePixels, width, height, highwayLength, highwayAngle, roadLength, iterations);
+  // // run LSystem
+
+  lsystemRoad = new LSystemRoad(textureData, 2000, 2000);
+  generateRoad();
 
   // instance render road system
   let vboData = lsystemRoad.getVBO();
