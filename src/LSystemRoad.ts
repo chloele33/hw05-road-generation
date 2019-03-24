@@ -89,10 +89,10 @@ class LSystemRoad {
              vec4.fromValues(-1, 0, -1, 0), 0, 0);
 
 
-        this.turtleStack.push(highwayTurtle3);
-        this.turtleStack.push(highwayTurtle4);
-
-        this.turtleStack.push(highwayTurtle2);
+         this.turtleStack.push(highwayTurtle3);
+         this.turtleStack.push(highwayTurtle4);
+        //
+         this.turtleStack.push(highwayTurtle2);
         this.turtleStack.push(highwayTurtle1);
 
 
@@ -206,7 +206,7 @@ class LSystemRoad {
             return;
         } else {
             //check to see if current position is above population threshold
-            // if so, check new turtle
+            //if so, check new turtle
             if (Math.abs(maxPop - this.globalMaxPop) < 0.018) {
                 //if (Math.random() > 0.65) {
                 if (this.currTurtle.orient[2] > this.currTurtle.orient[0]) {
@@ -306,7 +306,7 @@ class LSystemRoad {
                 this.intersections.push(new Intersection(vec3.fromValues(correctForward[0], correctForward[1], correctForward[2]), this.roadSize));
                 let newForward = new Turtle(vec4.fromValues(correctForward[0], correctForward[1], correctForward[2],
                     1), currRoadTurtle.orient, currRoadTurtle.depth, currRoadTurtle.iteration + 1);
-                newForward.moveForward(this.roadLength);
+               //newForward.moveForward(this.roadLength);
                 this.roadTurtleStack.push(newForward);
             }
         } else {
@@ -315,7 +315,7 @@ class LSystemRoad {
                 this.intersections.push(new Intersection(vec3.fromValues(proposedFoward[0], proposedFoward[1], proposedFoward[2]), this.roadSize));
                 let newForward = new Turtle(vec4.fromValues(proposedFoward[0], proposedFoward[1], proposedFoward[2],
                     1), currRoadTurtle.orient, currRoadTurtle.depth, currRoadTurtle.iteration + 1);
-                newForward.moveForward(this.roadLength);
+                //newForward.moveForward(this.roadLength);
                 this.roadTurtleStack.push(newForward);
             }
         }
@@ -326,7 +326,7 @@ class LSystemRoad {
                 this.intersections.push(new Intersection(vec3.fromValues(correctRight[0], correctRight[1], correctRight[2]), this.roadSize));
                 let newRight = new Turtle(vec4.fromValues(correctRight[0], correctRight[1], correctRight[2],
                     1), orient, currRoadTurtle.depth, currRoadTurtle.iteration + 1);
-                newRight.moveForward(this.roadLength);
+                //newRight.moveForward(this.roadLength);
                 this.roadTurtleStack.push(newRight);
             }
         } else {
@@ -335,7 +335,7 @@ class LSystemRoad {
                 this.intersections.push(new Intersection(vec3.fromValues(proposedRight[0], proposedRight[1], proposedRight[2]), this.roadSize));
                 let newRight = new Turtle(vec4.fromValues(proposedRight[0], proposedRight[1], proposedRight[2],
                     1), orient, currRoadTurtle.depth, currRoadTurtle.iteration + 1);
-                newRight.moveForward(this.roadLength);
+                //newRight.moveForward(this.roadLength);
                 this.roadTurtleStack.push(newRight);
             }
         }
@@ -347,7 +347,7 @@ class LSystemRoad {
                 let newLeft = new Turtle(vec4.fromValues(correctLeft[0], correctLeft[1], correctLeft[2],
                     1), orient, currRoadTurtle.depth, currRoadTurtle.iteration + 1);
                 newLeft.rotate(vec3.fromValues(0, 1, 0), -90);
-                newLeft.moveForward(this.roadLength);
+                //newLeft.moveForward(this.roadLength);
                 this.roadTurtleStack.push(newLeft);
             }
         } else {
@@ -357,7 +357,7 @@ class LSystemRoad {
                 let newLeft = new Turtle(vec4.fromValues(proposedLeft[0], proposedLeft[1], proposedLeft[2],
                     1), orient, currRoadTurtle.depth, currRoadTurtle.iteration + 1);
                 newLeft.rotate(vec3.fromValues(0, 1, 0), -90);
-                newLeft.moveForward(this.roadLength);
+                //newLeft.moveForward(this.roadLength);
                 this.roadTurtleStack.push(newLeft);
             }
         }
@@ -538,11 +538,13 @@ class LSystemRoad {
             }
               else {
                 // if close to intersecting a street, extend street to form an intersection
-                let extendedInter = this.extendSegment(startingPoint, testPoint, size, this.extension_coefficient* this.roadLength);
-                if (extendedInter != null) {
-                    testPoint = extendedInter.position;
-                    vec3.copy(endPoint, testPoint);
-                }
+                //if (pruneToIntersection == null) {
+                    let extendedInter = this.extendSegment(startingPoint, testPoint, size, this.extension_coefficient * this.roadLength);
+                    if (extendedInter != null) {
+                        testPoint = extendedInter.position;
+                        vec3.copy(endPoint, testPoint);
+                    }
+                //}
              }
         //}
 

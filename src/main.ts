@@ -17,11 +17,11 @@ const controls = {
   'Show Terrain' : true,
   'Show Population' : true,
   'Land vs. Water' : false,
-  'Iterations': 5,
-  'Road Length': 40,
+  'Iterations': 6,
+  'Road Length': 50,
   'Highway Length': 400,
-  'Snap Coefficient': 0.1,
-  'Extension Coefficient': 0.01
+  'Snap Coefficient': 0.6,
+  'Extension Coefficient': 0.03
 };
 
 let square: Square;
@@ -41,7 +41,7 @@ gui.add(controls, 'Iterations', 1, 7).step(1).onChange(
     function() {
       rerun = true;
     }.bind(this));
-gui.add(controls, 'Road Length', 18, 50).step(1).onChange(
+gui.add(controls, 'Road Length', 20, 80).step(1).onChange(
     function() {
       rerun = true;
     }.bind(this));
@@ -50,12 +50,12 @@ gui.add(controls, 'Highway Length', 385, 405).step(1).onChange(
       rerun = true;
     }.bind(this));
 
-gui.add(controls, 'Snap Coefficient', 0.1, 0.6).step(0.1).onChange(
+gui.add(controls, 'Snap Coefficient', 0.1, 0.9).step(0.1).onChange(
     function() {
       rerun = true;
     }.bind(this));
 
-gui.add(controls, 'Extension Coefficient', 0.01, 0.06).step(0.01).onChange(
+gui.add(controls, 'Extension Coefficient', 0.01, 0.09).step(0.01).onChange(
     function() {
       rerun = true;
     }.bind(this));
