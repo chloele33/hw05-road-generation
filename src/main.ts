@@ -20,8 +20,8 @@ const controls = {
   'Iterations': 5,
   'Road Length': 40,
   'Highway Length': 400,
-  'Snap Coefficient': 0.2,
-  'Extension Coefficient': 0.02
+  'Snap Coefficient': 0.1,
+  'Extension Coefficient': 0.01
 };
 
 let square: Square;

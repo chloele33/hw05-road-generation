@@ -148,9 +148,9 @@ void main() {
   if (u_LandWater == 1.0) {
     //Include an option to display a simple land versus water view.
     if (textureCol.g <= textureCol.b) {
-        color = vec3(6.0 / 255.0, 42.0 / 255.0, 76.0 / 255.0);
+        color = vec3(164.0 / 255.0, 200.0 / 255.0, 252.0 / 255.0);
       } else {
-        color = vec3(68.0 / 255.0, 100.0 / 255.0, 11.0 / 255.0);
+        color = vec3(148.0 / 255.0, 183.0 / 255.0, 95.0 / 255.0);
       }
   }
   out_Col = vec4(color, 1.0);
