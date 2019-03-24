@@ -20,11 +20,13 @@ class LSystemRoad {
     // Store your roads as sets of edges and intersections
     edges: Edge[];
     intersections: Intersection[];
-    intersectionsSet: Set<Intersection>;
+    intersectionsSet: Set<number[]>;
     highwaySize: number;
     roadLength: number;
     roadSize: number;
     iterations: number;
+    snap_coefficient: number;
+    extension_coefficient: number;
 
 
 
@@ -36,7 +38,7 @@ class LSystemRoad {
         this.currTurtle = new Turtle(randPos, orient, 0, 0);
         this.edges = [];
         this.intersections = [];
-        this.intersectionsSet = new Set<Intersection>();
+        this.intersectionsSet = new Set<number[]>();
         this.turtleStack = new TurtleStack(); //for highway turtles
         this.roadTurtleStack = new TurtleStack(); //for road turtles
         this.population_threshold = 0.8;
@@ -57,11 +59,14 @@ class LSystemRoad {
     }
 
     run( highwayLength: number,
-         highwayAngle: number, roadLength:number, iterations: number) {
+         highwayAngle: number, roadLength:number, iterations: number, snap_coefficient: number,
+         extension_coefficient: number) {
         this.iterations = iterations;
         this.roadLength = roadLength;
         this.highwayAngle = highwayAngle;
         this.highwayLength = highwayLength;
+        this.snap_coefficient = snap_coefficient;
+        this.extension_coefficient = extension_coefficient;
 
         this.growHighway();
         this.growRoads();
@@ -171,11 +176,16 @@ class LSystemRoad {
         // push highway vertices to intersections
         let newInter = new Intersection(vec3.fromValues(origin[0],
             origin[1], origin[2]),this.highwaySize);
-        this.intersections.push(newInter);
+        let newInterForSet = [origin[0], origin[1]];
         //this.intersections.push(new Intersection(correctEndPoint,this.highwaySize));
 
         // at every highway intersection, grow and push two road turtles to prep for road generation
-        if (!this.intersectionsSet.has(newInter) && this.currTurtle.iteration < 3) {
+        let existsCloseInter = this.existsCloseIntersection(vec3.fromValues(origin[0],
+            origin[1], origin[2]), this.highwaySize,  0.8 * this.highwayLength);
+        if (!existsCloseInter) {
+            this.intersections.push(newInter);
+        }
+        if (!existsCloseInter && !this.intersectionsSet.has(newInterForSet) && this.currTurtle.iteration < 5) {
             let roadTurtleOrigin = vec4.fromValues(origin[0], origin[1], origin[2], origin[3]);
             let roadTurtleDir = vec4.fromValues(this.currTurtle.orient[0], this.currTurtle.orient[1],
                 this.currTurtle.orient[2], this.currTurtle.orient[3]);
@@ -186,7 +196,7 @@ class LSystemRoad {
             leftTurtle.rotate(vec3.fromValues(0, 1, 0), -90);
             this.roadTurtleStack.push(rightTurtle);
             this.roadTurtleStack.push(leftTurtle);
-            this.intersectionsSet.add(newInter);
+            this.intersectionsSet.add(newInterForSet);
         }
 
         // kill turtle if out of bounds
@@ -518,7 +528,7 @@ class LSystemRoad {
             //console.log(endPoint);
         } //else {
             // if the end point is close to an existing intersection, use that inter as endpoint
-            let searchDist = 0.8 * this.roadLength;
+            let searchDist =  this.snap_coefficient * this.roadLength;
             let nearInter = this.existsCloseIntersection(testPoint, size, searchDist);
             if (nearInter != null) {
                 testPoint = nearInter.position;
@@ -528,7 +538,7 @@ class LSystemRoad {
             }
               else {
                 // if close to intersecting a street, extend street to form an intersection
-                let extendedInter = this.extendSegment(startingPoint, testPoint, size, 0.08* this.roadLength);
+                let extendedInter = this.extendSegment(startingPoint, testPoint, size, this.extension_coefficient* this.roadLength);
                 if (extendedInter != null) {
                     testPoint = extendedInter.position;
                     vec3.copy(endPoint, testPoint);

@@ -18,8 +18,10 @@ const controls = {
   'Show Population' : true,
   'Land vs. Water' : false,
   'Iterations': 5,
-  'Road Length': 25,
+  'Road Length': 35,
   'Highway Length': 400,
+  'Snap Coefficient': 0.2,
+  'Extension Coefficient': 0.02
 };
 
 let square: Square;
@@ -28,7 +30,7 @@ let time: number = 0.0;
 let lsystemRoad: LSystemRoad;
 let preIter = 5;
 let textureData: Uint8Array;
-let preRoadLength = 20;
+let preRoadLength = 30;
 let rerun = false;
 const gui = new DAT.GUI();
 // Add controls to the gui
@@ -39,7 +41,7 @@ gui.add(controls, 'Iterations', 1, 7).step(1).onChange(
     function() {
       rerun = true;
     }.bind(this));
-gui.add(controls, 'Road Length', 18, 40).step(1).onChange(
+gui.add(controls, 'Road Length', 18, 50).step(1).onChange(
     function() {
       rerun = true;
     }.bind(this));
@@ -48,6 +50,15 @@ gui.add(controls, 'Highway Length', 385, 400).step(1).onChange(
       rerun = true;
     }.bind(this));
 
+gui.add(controls, 'Snap Coefficient', 0.1, 0.6).step(0.1).onChange(
+    function() {
+      rerun = true;
+    }.bind(this));
+
+gui.add(controls, 'Extension Coefficient', 0.01, 0.06).step(0.01).onChange(
+    function() {
+      rerun = true;
+    }.bind(this));
 
 function generateRoad() {
   // pass texture data to road LSystem
@@ -55,7 +66,9 @@ function generateRoad() {
   let highwayAngle = 10;
   let roadLength = controls['Road Length'];
   let iterations = controls['Iterations'];
-  lsystemRoad.run(highwayLength, highwayAngle, roadLength, iterations);
+  let snap_coefficient = controls["Snap Coefficient"]
+  let extension_coefficient = controls["Extension Coefficient"];
+  lsystemRoad.run(highwayLength, highwayAngle, roadLength, iterations, snap_coefficient, extension_coefficient);
   // run LSystem
 }
 
