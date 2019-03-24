@@ -132,7 +132,7 @@ float fbm3d(float x, float y, float z) {
 }
 
 float getTerrainHeight(float x, float y) {
-    float result = log(fbm(x * 1.5, y * 1.5) + 0.5);
+    float result = log(fbm(x * 1.8, y * 1.8) + 0.5);
     //result = 1.0 - pow(fbm(x * 1.5, y * 1.5), 1.5);
     return result;
 }

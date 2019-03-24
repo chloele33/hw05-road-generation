@@ -214,9 +214,9 @@ function main() {
   gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
 
   // pass texture data to road LSystem
-  let roadLength = 500;
+  let highwayLength = 400;
   let highwayAngle = 10;
-  lsystemRoad = new LSystemRoad(texturePixels, width, height, roadLength, highwayAngle);
+  lsystemRoad = new LSystemRoad(texturePixels, width, height, highwayLength, highwayAngle);
   // run LSystem
 
   // instance render road system

@@ -11,17 +11,19 @@ class LSystemRoad {
     turtleStack: TurtleStack;
     mapTexture: MapTexture;
     turtleStackHighway: TurtleStack;
-    roadLength: number; // distance to move forward
+    highwayLength: number; // distance to move forward
     population_threshold: number;
     highwayAngle: number;
+    globalMaxPop: number;
 
     // Store your roads as sets of edges and intersections
     edges: Edge[];
     intersections: Intersection[];
+    highwaySize: number;
 
 
 
-    constructor (textureData: Uint8Array, texWidth: number, texHeight: number, roadLength: number, highwayAngle: number) {
+    constructor (textureData: Uint8Array, texWidth: number, texHeight: number, highwayLength: number, highwayAngle: number) {
         //Your Turtle will begin from a random point in the bounds of your screen.
         let randPos = vec4.fromValues(Math.random() - 0.5, Math.random() - 0.5, 1, 1);
         let orient = vec4.fromValues(0, 1, 0, 0);
@@ -30,30 +32,44 @@ class LSystemRoad {
         this.edges = [];
         this.intersections = [];
         this.turtleStack = new TurtleStack();
-        this.roadLength = roadLength;
+        this.highwayLength = highwayLength;
         this.population_threshold = 0.8;
         this.highwayAngle = highwayAngle;
+        this.highwaySize = 10;
+        this.globalMaxPop = 0.0;
 
-
-        // this.edges.push(new Edge(vec3.fromValues(0, 0, 60), vec3.fromValues(2000,0, 2000), 5));
-        // this.edges.push(new Edge(vec3.fromValues(20, 0, 0), vec3.fromValues(2000,0, 2000), 15));
+        // //
+        // this.edges.push(new Edge(vec3.fromValues(2000, 0, 0), vec3.fromValues(0,0, 2000), 5));
+        // //this.edges.push(new Edge(vec3.fromValues(0, 0, 2000), vec3.fromValues(2000,0, 0), 15));
+        //
+        // let newPoint = this.addRoadToNetwork(vec3.fromValues(0, 0, 0),vec3.fromValues(2000,0, 2000),5 );
+        // this.edges.push(new Edge(vec3.fromValues(0, 0, 0), newPoint, 5));
 
         this.growHighway();
     }
 
     // generate highway system
     growHighway() {
-        // Turtle will begin from a random point in the bounds of your screen.
-        let origin = vec4.fromValues(200, 0, 200, 1);
+        // Turtle will begin from arbitrary point in the bounds of your screen.
+        let origin = vec4.fromValues(0, 0, 0, 1);
         let dir = vec4.fromValues(0, 0, 1, 0);
         let highwayTurtle1 = new Turtle(origin, dir, 0);
+
+        let highwayTurtle2 = new Turtle(vec4.fromValues(1800, 0, 1300, 1),
+            vec4.fromValues(-1, 0, -1, 0), 0);
+
+        let highwayTurtle3 = new Turtle(vec4.fromValues(2000, 0, 1800, 1),
+            vec4.fromValues(0, 0, -1, 0), 0);
+
+        this.turtleStack.push(highwayTurtle3);
+        this.turtleStack.push(highwayTurtle2);
         this.turtleStack.push(highwayTurtle1);
 
-        while(this.turtleStack.size() != 0) {
+        while(this.turtleStack.size() > 0) {
+            console.log("HI");
             this.currTurtle = this.turtleStack.pop();
             // run this turtle and push more turtles to the stack
-            console.log("HIIII");
-            while (this.currTurtle.alive && this.currTurtle.depth < 30) {
+            while (this.currTurtle.alive && this.currTurtle.depth < 20) {
                 this.moveHighwayTurtle(this.currTurtle);
             }
         }
@@ -72,21 +88,28 @@ class LSystemRoad {
         let biasTowardsOrient = vec4.fromValues(0, 0, 1, 0);
         vec4.copy(biasTowardsOrient, this.currTurtle.orient);
         let maxPop = 0.0;
+        let minPop = 1000.0;
         while (count < 4) {
             count++;
             // reset turtle orient
              //vec4.copy(this.currTurtle.orient, vec4.fromValues(0, 0, 1, 0));
              let orient = this.currTurtle.rotate(vec3.fromValues(0, 1 ,0), this.highwayAngle);
-             let goal_x = this.currTurtle.pos[0] + this.roadLength * orient[0];
-             let goal_y = this.currTurtle.pos[1] + this.roadLength * orient[1];
-             let goal_z = this.currTurtle.pos[2] + this.roadLength * orient[2];
+             let goal_x = this.currTurtle.pos[0] + this.highwayLength * orient[0];
+             let goal_y = this.currTurtle.pos[1] + this.highwayLength * orient[1];
+             let goal_z = this.currTurtle.pos[2] + this.highwayLength * orient[2];
              let pop = this.checkPopulation(vec3.fromValues(goal_x,goal_y,goal_z));
-             console.log(pop);
+             //console.log(pop);
              if (pop && pop > maxPop) {
                  //console.log(count);
                  maxPop = pop;
                  vec4.copy(biasTowardsOrient, orient);
                  //console.log(biasTowardsOrient);
+                 if (pop > this.globalMaxPop) {
+                     this.globalMaxPop = pop;
+                 }
+             }
+             if (pop && pop < minPop) {
+                 minPop = pop;
              }
             // // push highway to edges
             // this.edges.push(new Edge(vec3.fromValues(this.currTurtle.pos[0], this.currTurtle.pos[1], this.currTurtle.pos[2]),
@@ -94,40 +117,70 @@ class LSystemRoad {
             //     3));
         }
 
-        // move turtle towards bias direction
+
+
+
+
         vec4.copy(this.currTurtle.orient, biasTowardsOrient);
         //console.log(currTurtle.orient);
-        let end_x = this.currTurtle.pos[0] + this.roadLength * this.currTurtle.orient[0];
-        let end_y = this.currTurtle.pos[1] + this.roadLength * this.currTurtle.orient[1];
-        let end_z = this.currTurtle.pos[2] + this.roadLength * this.currTurtle.orient[2];
-        let goal_endPoint = vec4.fromValues(end_x, end_y, end_z, 1);
+        let end_x = this.currTurtle.pos[0] + this.highwayLength * this.currTurtle.orient[0];
+        let end_y = this.currTurtle.pos[1] + this.highwayLength * this.currTurtle.orient[1];
+        let end_z = this.currTurtle.pos[2] + this.highwayLength * this.currTurtle.orient[2];
+
+        let offsetOrigin = vec4.create();
+        vec4.multiply(offsetOrigin, [1, 1, 1, 1], this.currTurtle.orient);
+        vec4.add(origin, origin, offsetOrigin);
+
+        // check local constraints
+         let correctEndPoint = this.addRoadToNetwork(vec3.fromValues(origin[0], origin[1], origin[2]),
+             vec3.fromValues(end_x, end_y, end_z), this.highwaySize);
+        //let correctEndPoint = vec3.fromValues(end_x, end_y, end_z);
+        // move turtle towards bias direction
         //let newTurtle = new Turtle(goal_endPoint, currTurtle.orient, 0);
-        this.currTurtle.moveForward(this.roadLength);
+        this.currTurtle.moveForward(this.distance(vec3.fromValues(origin[0], origin[1], origin[2]), correctEndPoint));
+
+        // push highway to edges
+
+        this.edges.push(new Edge(vec3.fromValues(origin[0], origin[1], origin[2]),
+            correctEndPoint,
+            this.highwaySize));
+        // push highway vertices to intersections
+        this.intersections.push(new Intersection(vec3.fromValues(origin[0],
+            origin[1], origin[2]),this.highwaySize))
+        this.intersections.push(new Intersection(correctEndPoint,this.highwaySize));
 
         // kill turtle if out of bounds
         if (this.isOutOfBound(this.currTurtle)) {
             this.currTurtle.alive = false;
             this.turtleStack.pop();
-            console.log("OUT");
             return;
+        } else {
+            //check to see if current position is above population threshold
+            // if so, check new turtle
+            if (Math.abs(maxPop - this.globalMaxPop) < 0.018) {
+                //if (Math.random() > 0.65) {
+                if (this.currTurtle.orient[2] > this.currTurtle.orient[0]) {
+                    this.turtleStack.push(new Turtle(vec4.fromValues(correctEndPoint[0],
+                        correctEndPoint[1], correctEndPoint[2], 1), vec4.fromValues(0, 0, -1, 0), 0));
+                        this.turtleStack.push(new Turtle(vec4.fromValues(correctEndPoint[0],
+                            correctEndPoint[1], correctEndPoint[2], 1), vec4.fromValues(-1, 0, 0, 0), 0));
+                } else {
+                    this.turtleStack.push(new Turtle(vec4.fromValues(correctEndPoint[0],
+                        correctEndPoint[1], correctEndPoint[2], 1), vec4.fromValues(0, 0, 1, 0), 0));
+                    this.turtleStack.push(new Turtle(vec4.fromValues(correctEndPoint[0],
+                        correctEndPoint[1], correctEndPoint[2], 1), vec4.fromValues(-1, 0, 0, 0), 0));
+                }
+            }
         }
 
 
-        // check local constraints
 
-
-        // push highway to edges
-        this.edges.push(new Edge(vec3.fromValues(origin[0], origin[1], origin[2]),
-            vec3.fromValues(end_x, end_y, end_z),
-            15));
-
-        // check to see if current 
 
     }
 
     // returns a population density based on texture, between 0-1
     checkPopulation(endPoint: vec3) : number {
-        console.log(endPoint);
+        //console.log(endPoint);
         let pop = this.mapTexture.getPopulation(endPoint[0], endPoint[2]);
         //console.log(pop);
         return pop;
@@ -205,7 +258,7 @@ class LSystemRoad {
     isOutOfBound(currTurtle: Turtle) : boolean {
         if (currTurtle.pos[0] < 0 || currTurtle.pos[0] > 2000 ||
             currTurtle.pos[2] < 0 || currTurtle.pos[2] > 2000) {
-            console.log(currTurtle.pos);
+            //console.log(currTurtle.pos);
             return true;
         }
         return false;
@@ -219,31 +272,41 @@ class LSystemRoad {
     addRoadToNetwork(startingPoint: vec3, endPoint: vec3, size: number) : vec3 {
         // look for the correct endpoint
         // LOCAL CONSTRAINTS
+        let testPoint = vec3.create();
+        vec3.copy(testPoint, endPoint);
         // if two streets intersect, generate an intersection
-        let pruneToIntersection = this.intersectsExistingStreet(startingPoint, endPoint, size);
+        let pruneToIntersection = this.intersectsExistingStreet(startingPoint, testPoint, size);
         if (pruneToIntersection != null) {
-            endPoint = pruneToIntersection.position;
-        } else {
-            // if the end point is close to an existing intersection, use that inter as endpoint
-            let searchDist = 5;
-            let nearInter = this.existsCloseIntersection(endPoint, size, searchDist);
-            if (nearInter != null) {
-                endPoint = nearInter.position;
-            } else {
-                // if close to intersecting a street, extend street to form an intersection
-                let extendedInter = this.extendSegment(startingPoint, endPoint, size, searchDist);
-                if (extendedInter != null) {
-                    endPoint = extendedInter.position;
-                }
-            }
+            vec3.copy(testPoint, pruneToIntersection.position);
+           // console.log("old", endPoint);
+           // console.log("newInter", testPoint);
+            vec3.copy(endPoint, testPoint);
         }
+        // } else {
+        //     // if the end point is close to an existing intersection, use that inter as endpoint
+        //     let searchDist = 50;
+        //     let nearInter = this.existsCloseIntersection(testPoint, size, searchDist);
+        //     if (nearInter != null) {
+        //         testPoint = nearInter.position;
+        //         vec3.copy(endPoint, testPoint);
+        //
+        //     } else {
+        //         // if close to intersecting a street, extend street to form an intersection
+        //         let extendedInter = this.extendSegment(startingPoint, testPoint, size, searchDist);
+        //         if (extendedInter != null) {
+        //             testPoint = extendedInter.position;
+        //             vec3.copy(endPoint, testPoint);
+        //
+        //         }
+        //     }
+        // }
 
         let newEdge = new Edge(startingPoint, endPoint, size);
         let endNode = new Intersection(endPoint, size);
 
         //push to our collections of intersections and edges
-        this.edges.push(newEdge);
-        this.intersections.push(endNode);
+        // this.edges.push(newEdge);
+        // this.intersections.push(endNode);
 
         return endPoint;
     }
@@ -317,8 +380,8 @@ class MapTexture {
     }
 
     getPopulation(x: number, y: number) : number {
-        console.log("HERE" + this.texData.length);
-        console.log(x, y);
+        //console.log("HERE" + this.texData.length);
+        //console.log(x, y);
          let xPos = Math.floor((x));
          let yPos = Math.floor((y) );
         // let xPos = Math.floor(x / 2.0);
@@ -326,7 +389,7 @@ class MapTexture {
 
         let offset = 2;
         let index = yPos * 2000 * 4 + xPos * 4 + offset;
-        console.log(index);
+        //console.log(index);
         let result = this.texData[index];
         return result / 255.0;
 
@@ -397,6 +460,7 @@ class Edge {
         }
 
         return null;
+
     }
 
 
